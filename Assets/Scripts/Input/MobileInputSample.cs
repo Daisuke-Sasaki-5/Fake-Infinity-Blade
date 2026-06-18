@@ -10,6 +10,8 @@ public class MobileInputVisualizer : MonoBehaviour
     [SerializeField]
     private float swipeDistance = 80f;
 
+    [SerializeField] private Player player;
+
     private Vector2 startPosition;
     private Vector2 currentPosition;
 
@@ -178,6 +180,7 @@ public class MobileInputVisualizer : MonoBehaviour
         if(Mathf.Abs(diff.x) > Mathf.Abs(diff.y))
         {
             currentState = diff.x > 0 ? "swipe right" : "swipe left";
+            player.Attack();
         }
         else
         {
