@@ -16,6 +16,7 @@ public class MobileInputVisualizer : MonoBehaviour
     private Vector2 currentPosition;
 
     private bool isTouching;
+    private bool isUIMouseClick;
 
     private string currentState = "None";
 
@@ -55,6 +56,13 @@ public class MobileInputVisualizer : MonoBehaviour
     {
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
+            isUIMouseClick = EventSystem.current.IsPointerOverGameObject();
+
+            if (isUIMouseClick)
+            {
+                return;
+            }
+
             startPosition = Mouse.current.position.ReadValue();
             currentPosition = startPosition;
 
@@ -66,6 +74,8 @@ public class MobileInputVisualizer : MonoBehaviour
 
         if (Mouse.current.leftButton.isPressed)
         {
+            if(isUIMouseClick) { return; }
+
             currentPosition = Mouse.current.position.ReadValue();
 
             holdTimer += Time.deltaTime;
@@ -74,14 +84,22 @@ public class MobileInputVisualizer : MonoBehaviour
             {
                 isGuarding = true;
                 currentState = "Guard";
+                player.StartGuard();
             }
         }
 
         if (Mouse.current.leftButton.wasReleasedThisFrame)
         {
+            if (isUIMouseClick)
+            {
+                isUIMouseClick = false;
+                return;
+            }
+
             if (isGuarding)
             {
                 currentState = "Guard End";
+                player.EndGuard();
             }
             else
             {
@@ -142,6 +160,7 @@ public class MobileInputVisualizer : MonoBehaviour
             {
                 isGuarding = true;
                 currentState = "Guard";
+                player.StartGuard();
             }
         }
 
@@ -156,6 +175,7 @@ public class MobileInputVisualizer : MonoBehaviour
             if (isGuarding)
             {
                 currentState = "Guard End";
+                player.EndGuard();
             }
             else
             {
@@ -180,12 +200,13 @@ public class MobileInputVisualizer : MonoBehaviour
         if(Mathf.Abs(diff.x) > Mathf.Abs(diff.y))
         {
             currentState = diff.x > 0 ? "swipe right" : "swipe left";
-            player.Attack();
         }
         else
         {
             currentState = diff.y > 0 ? "swipe up" : "swipe down";
         }
+
+        player.Attack();
     }
 
     void OnGUI()
